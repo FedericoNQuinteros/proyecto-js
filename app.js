@@ -34,6 +34,8 @@ function agregarProducto() {
    let precioIngresado = parseInt(prompt("Ingrese el precio"))
    const productoNuevo = new Producto(ropero.length + 1, equipoIngresado, camisetaIngresado, precioIngresado)
    ropero.push(productoNuevo)
+   console.log(`Agregaste la ${camisetaIngresado} del equipo ${equipoIngresado} por un valor de ${precioIngresado}`)
+   alert(`Agregaste la ${camisetaIngresado} del equipo ${equipoIngresado} por un valor de ${precioIngresado}`)
 
 }
 
@@ -41,7 +43,10 @@ function verCatalogo(array) {
    console.log(`Nuestro catalogo es: `)
    for (let producto of array) {
       console.log(producto.id, producto.equipo, producto.camiseta, producto.precio)
+
    }
+
+
 }
 
 function buscarPorCamiseta(array) {
@@ -129,7 +134,7 @@ function menu() {
    let salirMenu = false
 
    do {
-      let opcionIngresada = parseInt(prompt(`Ingrese la opción deseada
+      let opcionIngresada = parseInt(prompt(`Ingrese el n° de la opción deseada:
      1 - Agregar producto
      2 - Consultar catálogo
      3 - Buscar por camiseta
