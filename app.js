@@ -28,25 +28,13 @@ const ropero = []
 ropero.push(producto1, producto2, producto3, producto4, producto5, producto6)
 
 
-function agregarProducto() {
-   let equipoIngresado = prompt("Ingrese el equipo")
-   let camisetaIngresado = prompt("Ingrese la camiseta")
-   let precioIngresado = parseInt(prompt("Ingrese el precio"))
-   const productoNuevo = new Producto(ropero.length + 1, equipoIngresado, camisetaIngresado, precioIngresado)
-   ropero.push(productoNuevo)
-   console.log(`Agregaste la ${camisetaIngresado} del equipo ${equipoIngresado} por un valor de ${precioIngresado}`)
-   alert(`Agregaste la ${camisetaIngresado} del equipo ${equipoIngresado} por un valor de ${precioIngresado}`)
 
-}
 
 function verCatalogo(array) {
    console.log(`Nuestro catalogo es: `)
    for (let producto of array) {
       console.log(producto.id, producto.equipo, producto.camiseta, producto.precio)
-
    }
-
-
 }
 
 function buscarPorCamiseta(array) {
@@ -68,21 +56,33 @@ function buscarPorEquipo(array) {
    )
    if (array.length == 0) {
       console.log(`Para el equipo ${equipoBusqueda} no hay coincidencias en nuestro catalogo`)
-   } else {
+   } else   {
       verCatalogo(busqueda)
    }
 }
 
-function filtrarPorEquipoCamiseta(array) {
-   let datoBusqueda = prompt("Ingrese el equipo o camiseta que desea encontrar")
-   let busqueda = array.filter(
-      (dato) => dato.equipo.toLowerCase() == datoBusqueda.toLowerCase() || dato.camiseta.toLowerCase() == datoBusqueda.toLowerCase()
-   )
-   if (busqueda.length == 0) {
-      console.log(`El producto ${datoBusqueda} no está en nuestro catalogo ni como título ni como equipo`)
-   } else {
-      verCatalogo(busqueda)
-   }
+function agregarProducto() {
+   let equipoIngresado = prompt("Ingrese el equipo")
+   let camisetaIngresado = prompt("Ingrese la camiseta")
+   let precioIngresado = parseInt(prompt("Ingrese el precio"))
+   const productoNuevo = new Producto(ropero.length + 1, equipoIngresado, camisetaIngresado, precioIngresado)
+   ropero.push(productoNuevo)
+   console.log(`Agregaste la ${camisetaIngresado} del equipo ${equipoIngresado} por un valor de ${precioIngresado}`)
+   alert(`Agregaste la ${camisetaIngresado} del equipo ${equipoIngresado} por un valor de ${precioIngresado}`)
+
+}
+function eliminarProducto(array){
+   verCatalogo(array)
+   let eliminarID = parseInt(prompt("Ingrese el id que desea eliminar"))
+   let arrayID = array.map(producto => producto.id)
+   console.log(arrayID)
+
+   let indice = arrayID.indexOf(eliminarID)
+   console.log(indice)
+
+   array.splice(indice, 1)
+   verCatalogo(array)
+
 }
 
 function ordenarMenorMayor(array) {
@@ -116,19 +116,6 @@ function ordenar(array) {
    }
 }
 
-function filtrarPorEquipoCamisetaIncludes(array) {
-   let datoBusqueda = prompt("Ingrese el equipo o camiseta que desea encontrar")
-   let busqueda = array.filter(
-      (dato) => dato.equipo.toLowerCase().includes(datoBusqueda.toLowerCase()) || dato.camiseta.toLowerCase().includes(datoBusqueda.toLowerCase())
-   )
-   if (busqueda.length == 0) {
-      console.log(`El producto ${datoBusqueda} no está en nuestro catalogo`)
-   } else {
-      verCatalogo(busqueda)
-   }
-}
-
-filtrarPorEquipoCamisetaIncludes(ropero)
 function menu() {
 
    let salirMenu = false
@@ -136,25 +123,29 @@ function menu() {
    do {
       let opcionIngresada = parseInt(prompt(`Ingrese el n° de la opción deseada:
      1 - Agregar producto
-     2 - Consultar catálogo
-     3 - Buscar por camiseta
-     4 - Buscar por equipo
-     5 - Ordenar producto:
+     2 - Borrar producto
+     3 - Consultar catálogo
+     4 - Buscar por camiseta
+     5 - Buscar por equipo
+     6 - Ordenar producto:
      0 - Salir del menu`))
       switch (opcionIngresada) {
          case 1:
             agregarProducto()
             break
          case 2:
-            verCatalogo(ropero)
+            eliminarProducto(ropero)
             break
          case 3:
+               verCatalogo(ropero)
+               break   
+         case 4:
             buscarPorCamiseta(ropero)
             break
-         case 4:
+         case 5:
             buscarPorEquipo(ropero)
             break
-         case 5:
+         case 6:
             ordenar(ropero)
             break
          case 0:
