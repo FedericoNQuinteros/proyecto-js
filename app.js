@@ -12,7 +12,7 @@ class Producto {
    }
 }
 
-const producto1 = new Producto(1, "River", "Suplente 2012", 16000)
+const producto1 = new Producto(1, "River", "Suplente 2012", 26000)
 
 const producto2 = new Producto(2, "River", "Titular 2001", 37000)
 
@@ -24,8 +24,16 @@ const producto5 = new Producto(5, "Milan", "Arquero 2007", 32000)
 
 const producto6 = new Producto(6, "Milan", "Titular 2011", 18000)
 
+const producto7 = new Producto(7, "Inter", "Titular 2006", 21000)
+
+const producto8 = new Producto(8, "Inter", "Titular 2009", 38000)
+
+const producto9 = new Producto(9, "Argentina", "Suplente 1998", 12000)
+
+const producto10 = new Producto(10, "River", "Titular 2012", 22500)
+
 const ropero = []
-ropero.push(producto1, producto2, producto3, producto4, producto5, producto6)
+ropero.push(producto1, producto2, producto3, producto4, producto5, producto6, producto7, producto8, producto9, producto10)
 
 
 
@@ -42,7 +50,7 @@ function buscarPorCamiseta(array) {
    let busqueda = array.filter(
       (producto) => producto.camiseta.toLowerCase().includes(camisetaBusqueda.toLowerCase())
    )
-   if (array.length == 0) {
+   if (busqueda == 0) {
       console.log(`Para la camiseta ${camisetaBusqueda} no hay coincidencias en nuestro catalogo`)
    } else {
       verCatalogo(busqueda)
@@ -54,7 +62,7 @@ function buscarPorEquipo(array) {
    let busqueda = array.filter(
       (producto) => producto.equipo.toLowerCase().includes(equipoBusqueda.toLowerCase())
    )
-   if (array.length == 0) {
+   if (busqueda == 0) {
       console.log(`Para el equipo ${equipoBusqueda} no hay coincidencias en nuestro catalogo`)
    } else   {
       verCatalogo(busqueda)
@@ -137,8 +145,8 @@ function menu() {
             eliminarProducto(ropero)
             break
          case 3:
-               verCatalogo(ropero)
-               break   
+            verCatalogo(ropero)
+            break   
          case 4:
             buscarPorCamiseta(ropero)
             break
