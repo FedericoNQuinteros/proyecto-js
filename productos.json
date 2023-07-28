@@ -1,0 +1,78 @@
+[
+        {
+          "id": 1,
+          "nombre": "Milan Arquero 2007",
+          "precio": 25000,
+          "stock": 100,
+          "imagen": "milanarquero.jpg"
+        },
+        {
+          "id": 2,
+          "nombre": "Milan Titular 2012",
+          "precio": 30000,
+          "stock": 50,
+          "imagen": "milan2012.jpg"
+        },
+        {
+          "id": 3,
+          "nombre": "Lazio Titular 2001",
+          "precio": 21500,
+          "stock": 30,
+          "imagen": "lazio2001.jpg"
+        },
+        {
+          "id": 4,
+          "nombre": "Barcelona Titular 2014",
+          "precio": 15000,
+          "stock": 80,
+          "imagen": "barcelona2014.jpg"
+
+        },
+        {
+          "id": 5,
+          "nombre": "Inter Titular 2010",
+          "precio": 40500,
+          "stock": 80,
+          "imagen": "inter2010.jpg"
+        },
+
+        {
+          "id": 6,
+          "nombre": "Inter Porto Alegre 2010",
+          "precio": 35000,
+          "stock": 20,
+          "imagen": "portoalegre2010.jpg"
+        },
+        
+        {
+          "id": 7,
+          "nombre": "River Plate 2001",
+          "precio": 25500,
+          "stock": 30,
+          "imagen": "river2001.jpg"
+        },
+                
+        {
+          "id": 8,
+          "nombre": "River Plate 2001",
+          "precio": 50000,
+          "stock": 10,
+          "imagen": "rivernegra2013.jpg"
+        },
+                        
+        {
+          "id": 9,
+          "nombre": "River Plate 2001",
+          "precio": 45000,
+          "stock": 20,
+          "imagen": "riversuplente99.jpg"
+        },
+                        
+        {
+          "id": 10,
+          "nombre": "River Plate 2001",
+          "precio": 75000,
+          "stock": 25,
+          "imagen": "rivertitular99.jpg"
+        }
+      ]

@@ -1,4 +1,6 @@
-function ordenarProductos() {
+
+// Función para ordenar los productos según el criterio seleccionado
+async function ordenarProductos() {
   const orden = document.getElementById("orden").value;
 
   if (orden === "precioAscendente") {
@@ -6,50 +8,87 @@ function ordenarProductos() {
   } else if (orden === "precioDescendente") {
     productos.sort((a, b) => b.precio - a.precio);
   }
-
   mostrarResultados(productos);
 }
 
+// Función para limpiar los campos de entrada
 function limpiarCampos() {
   document.getElementById("nombre").value = "";
   document.getElementById("precio").value = "";
   document.getElementById("stock").value = "";
 }
 
-// Array de productos
-const productos = [
-  { id: 1, nombre: "Barcelona Titular 2014", precio: 11000, cantidad: 0, imagen: "barcelona2014.jpg", stock: 10 },
-  { id: 2, nombre: "Inter de Milan Titular 2010", precio: 13000, cantidad: 0, imagen: "inter2010.jpg", stock: 8 },
-  { id: 3, nombre: "Lazio Titular 2001", precio: 31000, cantidad: 0, imagen: "lazio2001.jpg", stock: 3 },
-  { id: 4, nombre: "Milan titular 2012", precio: 15000, cantidad: 0, imagen: "milan2012.jpg", stock: 6 },
-  { id: 5, nombre: "Milan Arquero", precio: 30000, cantidad: 0, imagen: "milanarquero.jpg", stock: 6 },
-  { id: 6, nombre: "Inter de Porto Alegre Titular 2010", precio: 35000, cantidad: 0, imagen: "portoalegre2010.jpg", stock: 7 },
-  { id: 7, nombre: "River Titular 2001", precio: 58000, cantidad: 0, imagen: "river2001.jpg", stock: 9 },
-  { id: 8, nombre: "River Suplente 2013", precio: 42500, cantidad: 0, imagen: "rivernegra2013.jpg", stock: 5 },
-  { id: 9, nombre: "River Suplente 1999", precio: 5000, cantidad: 0, imagen: "riversuplente99.jpg", stock: 10 },
-  { id: 10, nombre: "River Titular 1999", precio: 17000, cantidad: 0, imagen: "rivertitular99.jpg", stock: 5 },
-];
+let productos = [];
 
-
-let agregarCamisetaBtn = document.getElementById("guardarProductoBtn")
-
-// Función para guardar los datos de los productos en el localStorage
-function guardarProductos() {
-  localStorage.setItem('productos', JSON.stringify(productos));
-}
-
-// Función para cargar los datos de los productos desde el localStorage
-function cargarProductos() {
-  const productosGuardados = localStorage.getItem('productos');
-  if (productosGuardados) {
-    camisetas = JSON.parse(productosGuardados);
+// Función para cargar los productos desde el archivo JSON
+async function cargarProductos() {
+  try {
+    const data = await $.getJSON("productos.json");
+    productos = data;
     mostrarResultados(productos);
+    actualizarStockCatalogo();
+  } catch (error) {
+    alert("Error al cargar los productos.");
   }
-  limpiarCampos();
 }
 
-// Llamada a la función cargarProductos al cargar la página
-window.addEventListener('load', cargarProductos);
+// Función para inicializar la aplicación
+async function init() {
+  try {
+    await cargarProductos();
+    const agregarStockBtn = $("#agregarStockBtn");
+    const formularioEliminar = $("#formularioEliminar");
+    const ordenSelect = $("#orden");
+    const mostrarCatalogoBtn = $("#mostrarCatalogoBtn");
+    const confirmarCompraBtn = $("#confirmarCompraBtn");
+
+    agregarStockBtn.on("click", agregarStock);
+    formularioEliminar.on("submit", eliminarStock);
+    ordenSelect.on("change", ordenarProductos);
+    mostrarCatalogoBtn.on("click", mostrarCatalogo);
+    confirmarCompraBtn.on("click", confirmarCompra);
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+// Función para guardar los productos en el LocalStorage
+function guardarProductos() {
+  localStorage.setItem("productos", JSON.stringify(productos));
+}
+
+// En el evento "DOMContentLoaded", se llama a la función init de manera asíncrona
+document.addEventListener("DOMContentLoaded", async function () {
+  await init();
+  const catalogo = document.getElementById("catalogo");
+  if (catalogo) {
+    catalogo.addEventListener("click", manejarClicProducto);
+  }
+  const busquedaInput = document.getElementById("busqueda");
+  if (busquedaInput) {
+    busquedaInput.addEventListener("keyup", buscarProductos);
+  }
+});
+// Función para buscar productos en el catálogo
+function buscarProductos() {
+  const busqueda = removerAcentos(document.getElementById("busqueda").value.toLowerCase());
+  const resultados = productos.filter(producto =>
+    removerAcentos(producto.nombre.toLowerCase()).includes(busqueda)
+  );
+  mostrarResultados(resultados);
+}
+// Función para remover acentos y caracteres especiales
+function removerAcentos(str) {
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+// Función para manejar el clic en el botón "+" para agregar productos al carrito
+function manejarClicProducto(event) {
+  const target = event.target;
+  if (target.classList.contains("btn-agregar")) {
+    const productoId = target.getAttribute("data-id");
+    agregarProducto(parseInt(productoId)); // Agregar un solo producto al carrito
+  }
+}
 
 // Función para agregar un producto al stock
 function agregarStock() {
@@ -57,50 +96,92 @@ function agregarStock() {
   const precio = document.getElementById("precio").value;
   const stock = document.getElementById("stock").value;
 
+  if (!nombre || !precio || !stock) {
+    alert("Por favor, complete todos los campos.");
+    return;
+  }
+
   const nuevoProducto = {
     id: generarIdUnico(),
     nombre: nombre,
     precio: parseFloat(precio),
     cantidad: 0,
     stock: parseInt(stock),
-    imagen: "nuevo.jpg"
+    imagen: "nuevo.jpg",
   };
 
   productos.push(nuevoProducto);
 
-  // Guardar los cambios en el localStorage
   guardarProductos();
 
-  // Resetear los campos de nombre, precio y stock
   document.getElementById("nombre").value = "";
   document.getElementById("precio").value = "";
   document.getElementById("stock").value = "";
 
-mostrarResultados(productos);
+  mostrarResultados(productos);
   limpiarCampos();
 }
+
+// Función para generar un ID único para los productos
 function generarIdUnico() {
-  return productos.length + 1; // Generar el ID basado en la longitud del array de productos
+  return productos.length + 1;
 }
+
 // Función para eliminar un producto del stock
-function eliminarStock() {
+function eliminarStock(event) {
+  event.preventDefault();
+
   const nombreProducto = document.getElementById("nombreEliminar").value.toLowerCase();
 
   const productoIndex = productos.findIndex((producto) => producto.nombre.toLowerCase() === nombreProducto);
+
   if (productoIndex !== -1) {
     productos.splice(productoIndex, 1);
-    guardarProductos(); // Guardar los cambios en el localStorage
-    mostrarResultados(productos); // Actualizar el catálogo en la interfaz
-    document.getElementById("formularioEliminar").reset(); // Resetear el formulario
+    guardarProductos();
+    mostrarResultados(productos);
+    document.getElementById("formularioEliminar").reset();
+    actualizarStockCatalogo();
+
+    // Mostrar el mensaje de alerta para el producto eliminado
+    alert(`Producto "${nombreProducto}" fue eliminado.`);
   } else {
     alert("No se encontró un producto con ese nombre");
   }
 }
-  // Carrito de compras
-const carrito = [];
 
-function mostrarCatalogo(array) {
+// Función para actualizar el stock en el catálogo
+// Función para actualizar el stock en el catálogo
+function actualizarStockCatalogo() {
   const catalogo = document.getElementById("catalogo");
+
+  // Eliminar todos los elementos hijos del catálogo para limpiarlo
+  while (catalogo.firstChild) {
+    catalogo.removeChild(catalogo.firstChild);
+  }
+
+  productos.forEach((producto) => {
+    const divProducto = document.createElement("div");
+    divProducto.classList.add("col-md-6");
+    divProducto.innerHTML = `
+        <div class="producto" data-id="${producto.id}">
+            <img src="img/${producto.imagen}" alt="${producto.nombre}" class="img-fluid">
+            <h3>${producto.nombre}</h3>
+            <p class="precio">$${producto.precio}</p>
+            <p class="stock">Stock: ${producto.stock}</p>
+            <button class="btn btn-primary btn-agregar" data-id="${producto.id}">+</button>
+        </div>
+    `;
+    catalogo.appendChild(divProducto);
+  });
+}
+
+// Función para mostrar u ocultar el catálogo
+function mostrarCatalogo() {
+  const catalogo = document.getElementById("catalogo");
+
+  if (!catalogo) {
+    return;
+  }
 
   if (catalogo.style.display === "none") {
     catalogo.style.display = "block";
@@ -110,47 +191,76 @@ function mostrarCatalogo(array) {
   }
 }
 
-function agregarProducto(index) {
-  const producto = productos[index - 1];
+// Función para mostrar los resultados en el catálogo
+function mostrarResultados(resultados) {
+  const catalogo = document.getElementById("catalogo");
+  let htmlCatalogo = "";
+
+  resultados.forEach((producto) => {
+    htmlCatalogo += `
+        <div class="col-lg-4 mb-4">
+            <div class="producto" data-id="${producto.id}">
+                <img src="img/${producto.imagen}" alt="${producto.nombre}" class="img-fluid">
+                <h3>${producto.nombre}</h3>
+                <p class="precio">$${producto.precio}</p>
+                <p class="stock">Stock: ${producto.stock}</p>
+                <button class="btn btn-primary btn-agregar" data-id="${producto.id}">+</button>
+            </div>
+        </div>
+    `;
+  });
+
+  catalogo.innerHTML = htmlCatalogo;
+}
+
+const carrito = [];
+
+// Función para agregar un producto al carrito
+function agregarProducto(id) {
+  const producto = productos.find((p) => p.id === id);
 
   if (producto) {
-    const carritoIndex = carrito.findIndex((item) => item.id === producto.id);
+    const carritoProducto = carrito.find((p) => p.id === id);
 
-    if (carritoIndex !== -1) {
-      // Validar si se ha alcanzado el stock máximo
-      if (carrito[carritoIndex].cantidad < producto.stock) {
-        carrito[carritoIndex].cantidad++;
+    if (carritoProducto) {
+      if (carritoProducto.cantidad < producto.stock) {
+        carritoProducto.cantidad++; // Agregar una unidad al carrito
+        guardarProductos(); // Guardar los cambios en el LocalStorage
+        actualizarStockCatalogo(); // Actualizar el stock en el catálogo
+        actualizarCarrito(); // Actualizar el contenido del carrito en la página
       } else {
-        alert('No hay suficiente stock disponible');
+        alert('No se puede agregar más al carrito. Stock insuficiente.');
       }
     } else {
-      // Validar si hay stock disponible
       if (producto.stock > 0) {
-        // Validar si se ha alcanzado el stock máximo
-        if (producto.cantidad < producto.stock) {
-          producto.cantidad++;
-          carrito.push(producto);
-        } else {
-          alert('No hay suficiente stock disponible');
-        }
+        carrito.push({ ...producto, cantidad: 1 }); // Agregar el producto al carrito con una cantidad de 1
+        guardarProductos(); // Guardar los cambios en el LocalStorage
+        actualizarStockCatalogo(); // Actualizar el stock en el catálogo
+        actualizarCarrito(); // Actualizar el contenido del carrito en la página
       } else {
-        alert('No hay stock disponible');
+        alert('No hay stock disponible para agregar al carrito.');
       }
     }
-
-    actualizarCarrito();
   } else {
     alert('Producto no encontrado');
   }
 }
-// Función para eliminar un producto del carrito de compra
+
+// Función para obtener la cantidad disponible de un producto en el stock
+function obtenerCantidadDisponible(id) {
+  const producto = productos.find((p) => p.id === parseInt(id));
+  const carritoProducto = carrito.find((p) => p.id === parseInt(id));
+  const stockDisponible = producto ? producto.stock : 0;
+  const carritoCantidad = carritoProducto ? carritoProducto.cantidad : 0;
+  return stockDisponible - carritoCantidad;
+}
+
+// Función para eliminar un producto del carrito
 function eliminarProductoCarrito(id) {
   const producto = carrito.find((item) => item.id === id);
 
   if (producto) {
     producto.cantidad--;
-
-    // Aumentar el stock disponible al eliminar del carrito
     producto.stock++;
 
     if (producto.cantidad === 0) {
@@ -158,63 +268,31 @@ function eliminarProductoCarrito(id) {
       carrito.splice(index, 1);
     }
 
+    actualizarStockCatalogo();
     actualizarCarrito();
   }
 }
+// Función para confirmar la compra y vaciar el carrito
+function confirmarCompra() {
+  alert("Compra confirmada. ¡Gracias por tu compra!");
+  carrito.length = 0;
+  actualizarCarrito();
+}
 
+// Función para actualizar el contenido del carrito en la página
+function actualizarCarrito() {
+  const listaCarrito = document.getElementById("lista-carrito");
+  const totalPrecio = document.getElementById("total-precio");
+  let htmlCarrito = "";
+  let total = 0;
 
-  // Función para confirmar la compra
-  function confirmarCompra() {
-    alert("Compra confirmada. ¡Gracias por tu compra!");
-    carrito.length = 0; // Vaciar el carrito
-    actualizarCarrito();
-  }
-  
-  // Función para buscar productos
-  function buscarProductos() {
-    const busqueda = document.getElementById("busqueda").value.toLowerCase();
-    const resultados = productos.filter(producto =>
-      producto.nombre.toLowerCase().includes(busqueda)
-    );
-    mostrarResultados(resultados);
-  }
-  
-  // Función para mostrar los resultados de búsqueda en el catálogo
-  function mostrarResultados(resultados) {
-    const catalogo = document.getElementById("catalogo");
-    let htmlCatalogo = "";
-  
-    resultados.forEach((producto) => {
-      htmlCatalogo += `
-        <div class="col-md-6">
-          <div class="producto">
-          <img src="img/${producto.imagen}" alt="${producto.nombre}" class="img-fluid">
-            <h3>${producto.nombre}</h3>
-            <p class="precio">$${producto.precio}</p>
-            <button class="btn btn-primary" onclick="agregarProducto(${producto.id})">+</button>
-          </div>
-        </div>
-      `;
-    });
-  
-    catalogo.innerHTML = htmlCatalogo;
-  }
-  
-  // Función para actualizar el contenido del carrito en la página
-  function actualizarCarrito() {
-    const listaCarrito = document.getElementById("lista-carrito");
-    const totalPrecio = document.getElementById("total-precio");
-    let htmlCarrito = "";
-    let total = 0;
-  
-    carrito.forEach((producto) => {
-      htmlCarrito += `<li>${producto.nombre} - $${producto.precio} x ${producto.cantidad} <button onclick="eliminarProductoCarrito(${producto.id})">-</button></li>`;
-      total += producto.precio * producto.cantidad;
-    });
-  
-    listaCarrito.innerHTML = htmlCarrito;
-    totalPrecio.textContent = total;
-  }
-  
-  // Mostrar todos los productos en el catálogo inicialmente
-  mostrarResultados(productos);
+  carrito.forEach((producto) => {
+    htmlCarrito += `<li>${producto.nombre} - $${producto.precio} x ${producto.cantidad} <button onclick="eliminarProductoCarrito(${producto.id})">-</button></li>`;
+    total += producto.precio * producto.cantidad;
+  });
+
+  listaCarrito.innerHTML = htmlCarrito;
+  totalPrecio.textContent = total;
+}
+
+mostrarResultados(productos);
